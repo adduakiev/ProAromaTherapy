@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import App from './App'; // Перевір, щоб шлях був саме таким
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
