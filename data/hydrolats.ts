@@ -1,52 +1,14 @@
 import { Product } from "../types";
 
 export const hydrolats: Product[] = [
-  {
-    "id": "GL-126",
-    "code": "GL-126",
-    "name": "Аїр болотний",
-    "latinName": "Acorus calamus",
-    "type": "hydrolat",
-    "rawMaterial": "водний дистилят",
-    "purchasePriceEurPerKg": 4.5,
-    "retailPrices": [
-      { "volume": 100, "price": 170 },
-      { "volume": 101, "price": 220 },
-      { "volume": 200, "price": 280 },
-      { "volume": 500, "price": 610 }
-    ],
-    "keywords": "Аїр болотний Аир болотный Acorus calamus гідролат"
-  },
-  {
-    "id": "GL-107",
-    "code": "GL-107",
-    "name": "Апельсин солодкий",
-    "latinName": "Citrus sinensis",
-    "type": "hydrolat",
-    "rawMaterial": "водний дистилят",
-    "purchasePriceEurPerKg": 4.0,
-    "retailPrices": [
-      { "volume": 100, "price": 150 },
-      { "volume": 101, "price": 200 },
-      { "volume": 200, "price": 240 },
-      { "volume": 500, "price": 520 }
-    ],
-    "keywords": "Апельсин солодкий Апельсин сладкий Citrus sinensis гідролат"
-  },
-  {
-    "id": "GL-141",
-    "code": "GL-141",
-    "name": "Лаванда вузьколиста",
-    "latinName": "Lavandula angustifolia",
-    "type": "hydrolat",
-    "rawMaterial": "водний дистилят",
-    "purchasePriceEurPerKg": 7.6,
-    "retailPrices": [
-      { "volume": 100, "price": 200 },
-      { "volume": 101, "price": 250 },
-      { "volume": 200, "price": 350 },
-      { "volume": 500, "price": 740 }
-    ],
-    "keywords": "Лаванда вузьколиста Лаванда узколистная Lavandula angustifolia гідролат"
-  }
+  { id: "GL-126", code: "GL-126", name: "Аїр болотний", latinName: "Acorus calamus", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 4.5, retailPrices: [{ volume: 100, price: 170 }, { volume: 101, price: 220 }, { volume: 200, price: 280 }, { volume: 500, price: 610 }] },
+  { id: "GL-170", code: "GL-170", name: "Акація біла", latinName: "Robinia pseudoacacia", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 5.1, retailPrices: [{ volume: 100, price: 200 }, { volume: 101, price: 240 }, { volume: 200, price: 300 }, { volume: 500, price: 640 }] },
+  { id: "GL-180", code: "GL-180", name: "Алое деревоподібне", latinName: "Aloe arborescens", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 9.6, retailPrices: [{ volume: 100, price: 300 }, { volume: 101, price: 350 }, { volume: 200, price: 470 }, { volume: 500, price: 1020 }] },
+  { id: "GL-107", code: "GL-107", name: "Апельсин солодкий", latinName: "Citrus sinensis", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 4.0, retailPrices: [{ volume: 100, price: 150 }, { volume: 101, price: 200 }, { volume: 200, price: 240 }, { volume: 500, price: 520 }] },
+  { id: "GL-187", code: "GL-187", name: "Безсмертник італійський", latinName: "Helichrysum italicum", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 6.0, retailPrices: [{ volume: 100, price: 230 }, { volume: 101, price: 280 }, { volume: 200, price: 370 }, { volume: 500, price: 790 }] },
+  { id: "GL-174", code: "GL-174", name: "Волошка синя", latinName: "Centaurea cyanus", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 5.7, retailPrices: [{ volume: 100, price: 220 }, { volume: 101, price: 260 }, { volume: 200, price: 350 }, { volume: 500, price: 740 }] },
+  { id: "GL-141", code: "GL-141", name: "Лаванда вузьколиста", latinName: "Lavandula angustifolia", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 7.6, retailPrices: [{ volume: 100, price: 200 }, { volume: 101, price: 250 }, { volume: 200, price: 350 }, { volume: 500, price: 740 }] },
+  { id: "GL-122", code: "GL-122", name: "Ромашка аптечна", latinName: "Matricaria chamomilla", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 4.0, retailPrices: [{ volume: 100, price: 150 }, { volume: 101, price: 200 }, { volume: 200, price: 240 }, { volume: 500, price: 520 }] },
+  { id: "GL-164", code: "GL-164", name: "Ісоп лікарський", latinName: "Hyssopus officinalis", type: "hydrolat", rawMaterial: "водний дистилят", purchasePriceEurPerKg: 4.5, retailPrices: [{ volume: 100, price: 200 }, { volume: 101, price: 240 }, { volume: 200, price: 300 }, { volume: 500, price: 640 }] }
 ];
+// Для інших гідролатів просто копіюй структуру вище

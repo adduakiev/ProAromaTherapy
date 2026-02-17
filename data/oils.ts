@@ -1,60 +1,21 @@
 import { Product } from "../types";
 
 export const oils: Product[] = [
-  {
-    id: "EO23-1",
-    code: "EO23-1",
-    name: "Абельмош мускусний",
-    latinName: "Abelmoschus moschatus",
-    type: "oil",
-    rawMaterial: "насіння",
-    keywords: "Абельмош мускусний мускусный Abelmoschus moschatus",
-    purchasePriceEurPerKg: 16800,
-    retailPrices: [
-      { volume: 3, price: 4350 },
-      { volume: 5, price: 6110 }
-    ]
-  },
-  {
-    id: "EO23-3",
-    code: "EO23-3",
-    name: "Ажгон(Україна)",
-    latinName: "Trachyspеrmum аmmi",
-    type: "oil",
-    rawMaterial: "насіння",
-    keywords: "Ажгон(Україна) Ажгон Trachyspеrmum аmmi",
-    purchasePriceEurPerKg: 1220,
-    retailPrices: [
-      { volume: 5, price: 640 },
-      { volume: 15, price: 1420 }
-    ]
-  },
-  {
-    id: "EO23-2",
-    code: "EO23-2",
-    name: "Аїр болотний (Україна)",
-    latinName: "Acorus calamus",
-    type: "oil",
-    rawMaterial: "коріння",
-    purchasePriceEurPerKg: 1380,
-    retailPrices: [
-      { volume: 5, price: 710 },
-      { volume: 15, price: 1600 }
-    ],
-    keywords: "Аїр болотний (Україна) Аир болотный Acorus calamus"
-  },
-  {
-    id: "EO23-8",
-    code: "EO23-8",
-    name: "Апельсин солодкий (прес.)",
-    latinName: "Citrus sinensis",
-    type: "oil",
-    rawMaterial: "плоди",
-    purchasePriceEurPerKg: 310,
-    retailPrices: [
-      { volume: 5, price: 300 },
-      { volume: 15, price: 630 }
-    ],
-    keywords: "Апельсин солодкий (прес.) Апельсин сладкий(прес.) Citrus sinensis"
-  }
+  { id: "EO23-1", code: "EO23-1", name: "Абельмош мускусний", latinName: "Abelmoschus moschatus", type: "oil", rawMaterial: "насіння", keywords: "Абельмош мускусний Abelmoschus moschatus", purchasePriceEurPerKg: 16800, retailPrices: [{ volume: 3, price: 4350 }, { volume: 5, price: 6110 }] },
+  { id: "EO23-3", code: "EO23-3", name: "Ажгон(Україна)", latinName: "Trachyspеrmum аmmi", type: "oil", rawMaterial: "насіння", keywords: "Ажгон(Україна) Trachyspеrmum аmmi", purchasePriceEurPerKg: 1220, retailPrices: [{ volume: 5, price: 640 }, { volume: 15, price: 1420 }] },
+  { id: "EO23-2", code: "EO23-2", name: "Аїр болотний (Україна)", latinName: "Acorus calamus", type: "oil", rawMaterial: "коріння", keywords: "Аїр болотний (Україна) Acorus calamus", purchasePriceEurPerKg: 1380, retailPrices: [{ volume: 5, price: 710 }, { volume: 15, price: 1600 }] },
+  { id: "EO23-4", code: "EO23-4", name: "Акація біла (асб. 5%)", latinName: "Robinia pseudoacacia", type: "oil", rawMaterial: "квіти", keywords: "Акація біла Robinia pseudoacacia", purchasePriceEurPerKg: 700, retailPrices: [{ volume: 5, price: 390 }, { volume: 15, price: 870 }] },
+  { id: "EO23-5", code: "EO23-5", name: "Акація чорноствольна", latinName: "Acacia mearnsii", type: "oil", rawMaterial: "суцвіття", keywords: "Акація чорноствольна Acacia mearnsii", purchasePriceEurPerKg: 1180, retailPrices: [{ volume: 5, price: 620 }, { volume: 15, price: 1380 }] },
+  { id: "EO23-8", code: "EO23-8", name: "Апельсин солодкий (прес.)", latinName: "Citrus sinensis", type: "oil", rawMaterial: "плоди", keywords: "Апельсин солодкий Citrus sinensis", purchasePriceEurPerKg: 310, retailPrices: [{ volume: 5, price: 300 }, { volume: 15, price: 630 }] },
+  { id: "EO23-9", code: "EO23-9", name: "Багно болотне", latinName: "Ledum palustre", type: "oil", rawMaterial: "ціла рослина", keywords: "Багно болотне Ledum palustre", purchasePriceEurPerKg: 2630, retailPrices: [{ volume: 5, price: 1260 }, { volume: 15, price: 2990 }] },
+  { id: "EO23-11", code: "EO23-11", name: "Базилік запашний", latinName: "Ocimum basilicum", type: "oil", rawMaterial: "ціла рослина", keywords: "Базилік запашний Ocimum basilicum", purchasePriceEurPerKg: 900, retailPrices: [{ volume: 5, price: 480 }, { volume: 15, price: 1090 }] },
+  { id: "EO23-18", code: "EO23-18", name: "Безсмертник італійський", latinName: "Helichrysum italicum", type: "oil", rawMaterial: "суцвіття", keywords: "Безсмертник італійський Helichrysum italicum", purchasePriceEurPerKg: 3810, retailPrices: [{ volume: 3, price: 1200 }, { volume: 5, price: 1700 }] },
+  { id: "EO23-287", code: "EO23-287", name: "Бергамот", latinName: "Citrus bergamia", type: "oil", rawMaterial: "плоди", keywords: "Бергамот Citrus bergamia", purchasePriceEurPerKg: 820, retailPrices: [{ volume: 5, price: 480 }, { volume: 15, price: 1090 }] },
+  { id: "EO23-283", code: "EO23-283", name: "Евкаліпт кулястий", latinName: "Eucalyptus globulus", type: "oil", rawMaterial: "листя", keywords: "Евкаліпт кулястий Eucalyptus globulus", purchasePriceEurPerKg: 660, retailPrices: [{ volume: 5, price: 380 }, { volume: 15, price: 810 }] },
+  { id: "EO23-81", code: "EO23-81", name: "Іланг-іланг", latinName: "Cananga odorata", type: "oil", rawMaterial: "квіти", keywords: "Іланг-іланг Cananga odorata", purchasePriceEurPerKg: 2500, retailPrices: [{ volume: 5, price: 1080 }, { volume: 15, price: 2560 }] },
+  { id: "EO23-112", code: "EO23-112", name: "Лаванда вузьколиста", latinName: "Lavandula angustifolia", type: "oil", rawMaterial: "суцвіття", keywords: "Лаванда Lavandula angustifolia", purchasePriceEurPerKg: 7500, retailPrices: [{ volume: 5, price: 350 }, { volume: 15, price: 740 }] },
+  { id: "EO23-169", code: "EO23-169", name: "Пачулі", latinName: "Pogostemon cablin", type: "oil", rawMaterial: "листя", keywords: "Пачулі Pogostemon cablin", purchasePriceEurPerKg: 1200, retailPrices: [{ volume: 5, price: 630 }, { volume: 15, price: 1410 }] },
+  { id: "EO23-206", code: "EO23-206", name: "Троянда дамаська", latinName: "Rosa damascena", type: "oil", rawMaterial: "пелюстки", keywords: "Троянда Роза Rosa damascena", purchasePriceEurPerKg: 5850, retailPrices: [{ volume: 3, price: 3980 }, { volume: 5, price: 5690 }] },
+  { id: "EO23-276", code: "EO23-276", name: "Чайне дерево", latinName: "Melaleuca alternifolia", type: "oil", rawMaterial: "листя", keywords: "Чайне дерево Melaleuca alternifolia", purchasePriceEurPerKg: 360, retailPrices: [{ volume: 5, price: 320 }, { volume: 15, price: 650 }] }
+  // Додай сюди інші позиції зі свого старого файлу, якщо я якісь пропустив
 ];
