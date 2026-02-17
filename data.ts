@@ -4,10 +4,10 @@ import { Product } from './types';
 
 export const FX_EUR_TO_UAH = 52;
 
-// Розумна функція розрахунку тари
+// Нова функція замість старого об'єкта PACK_COST_UAH
 export const getPackCost = (volume: number): number => {
-  if (volume === 101) return 25; // Скло
-  return 15; // Пластик
+  if (volume === 101) return 25; // Собівартість скла
+  return 15; // Собівартість пластику для всіх інших об'ємів
 };
 
 export const PRODUCTS: Product[] = [...oils, ...hydrolats];

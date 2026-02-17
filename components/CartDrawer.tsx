@@ -18,26 +18,27 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate }: Car
     setCart(cart.filter(item => item.id !== id));
   };
 
-  const calculateStats = () => {
-    return cart.reduce((acc, item) => {
-      const price = item.selectedPrice || 0;
-      const volume = item.selectedVolume || 0;
-      const purchasePriceKg = item.product?.purchasePriceEurPerKg || 0;
-      
-      const costProductEur = (purchasePriceKg / 1000) * volume;
-      const costProductUah = costProductEur * exchangeRate;
-      
-      // Використовуємо функцію замість об'єкта
-      const packCost = getPackCost(volume); 
-      
-      const profit = price - costProductUah - packCost;
+  // Усередині функції calculateStats:
+const calculateStats = () => {
+  return cart.reduce((acc, item) => {
+    const price = item.selectedPrice || 0;
+    const volume = item.selectedVolume || 0;
+    const purchasePriceKg = item.product?.purchasePriceEurPerKg || 0;
+    
+    const costProductEur = (purchasePriceKg / 1000) * volume;
+    const costProductUah = costProductEur * exchangeRate;
+    
+    // ВИКЛИКАЄМО ФУНКЦІЮ ЗАМІСТЬ ОБ'ЄКТА
+    const packCost = getPackCost(volume); 
+    
+    const profit = price - costProductUah - packCost;
 
-      return {
-        total: acc.total + price,
-        profit: acc.profit + profit
-      };
-    }, { total: 0, profit: 0 });
-  };
+    return {
+      total: acc.total + price,
+      profit: acc.profit + profit
+    };
+  }, { total: 0, profit: 0 });
+};
 
   const stats = calculateStats();
 

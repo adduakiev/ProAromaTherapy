@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Logo } from './components/Logo';
-import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data';
+import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data'; 
 import { Product, CartItem } from './types';
 import { Search, ShoppingBasket, Settings } from './components/Icons';
 import { ProductModal } from './components/ProductModal';
@@ -150,7 +150,7 @@ function App() {
         cart={cart}
         setCart={setCart}
         exchangeRate={exchangeRate}
-        packCosts={PACK_COST_UAH}
+        
       />
     </div>
   );
