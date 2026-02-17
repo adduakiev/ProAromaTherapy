@@ -153,5 +153,5 @@ function App() {
     </div>
   );
 }
-
+export default App; // Цей рядок МАЄ бути останнім
 
