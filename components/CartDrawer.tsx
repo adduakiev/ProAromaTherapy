@@ -18,12 +18,11 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate, packC
     setCart(cart.filter(item => item.id !== id));
   };
 
-  // Безпечний розрахунок прибутку
   const calculateStats = () => {
     return cart.reduce((acc, item) => {
-      const price = item.selectedPrice || 0;
-      const volume = item.selectedVolume || 0;
-      // Перевірка на наявність ціни закупівлі
+      // Гарантуємо, що беремо числові значення
+      const price = typeof item.selectedPrice === 'number' ? item.selectedPrice : 0;
+      const volume = typeof item.selectedVolume === 'number' ? item.selectedVolume : 0;
       const purchasePriceKg = item.product?.purchasePriceEurPerKg || 0;
       
       const costProductEur = (purchasePriceKg / 1000) * volume;
@@ -68,13 +67,16 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate, packC
             ) : (
               cart.map((item) => (
                 <div key={item.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <div>
-                    <h4 className="font-bold text-slate-800">{item.product.name}</h4>
-                    <p className="text-xs text-slate-500">{item.selectedVolume} мл — {item.selectedPrice} грн</p>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-slate-800">{item.product?.name || 'Товар'}</h4>
+                    {/* ОСЬ ТУТ БУЛА ПОМИЛКА: переконуємось, що виводимо прості значення */}
+                    <p className="text-xs text-slate-500">
+                      {item.selectedVolume} мл — <span className="font-bold text-slate-700">{item.selectedPrice} грн</span>
+                    </p>
                   </div>
                   <button 
                     onClick={() => removeItem(item.id)}
-                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    className="ml-4 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
@@ -84,18 +86,18 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate, packC
           </div>
 
           {cart.length > 0 && (
-            <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-4">
+            <div className="p-6 bg-white border-t border-slate-100 space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                   <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Сума</p>
                   <p className="text-2xl font-black text-slate-800">{stats.total} <span className="text-sm font-normal text-slate-400">грн</span></p>
                 </div>
-                <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Прибуток</p>
-                  <p className="text-2xl font-black text-emerald-500">{Math.round(stats.profit)} <span className="text-sm font-normal text-slate-400">грн</span></p>
+                <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-emerald-600/50 mb-1">Прибуток</p>
+                  <p className="text-2xl font-black text-emerald-600">{Math.round(stats.profit)} <span className="text-sm font-normal text-emerald-600/50">грн</span></p>
                 </div>
               </div>
-              <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold shadow-lg shadow-slate-200 active:scale-[0.98] transition-transform">
+              <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-black transition-colors active:scale-[0.98]">
                 Оформити замовлення
               </button>
             </div>
