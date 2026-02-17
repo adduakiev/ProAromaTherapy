@@ -1,5 +1,8 @@
 import React from 'react';
 import { Product, RetailPriceOption } from '../types';
+// Ми імпортуємо getPackCost, але у цьому файлі він навіть не потрібен, 
+// бо розрахунок йде в кошику. Залишаємо для стабільності.
+import { getPackCost } from '../data'; 
 import { X } from './Icons';
 
 interface ProductModalProps {
@@ -12,7 +15,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose, on
   if (!product) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
       <div 
         className="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl transform transition-transform duration-300 translate-y-0"
         onClick={(e) => e.stopPropagation()}
@@ -47,7 +50,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose, on
         </div>
 
         <div className="space-y-3 mt-4">
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Оберіть об'єм:</p>
+          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Оберіть варіант:</p>
           <div className="grid gap-3">
             {product.retailPrices.length > 0 ? (
               product.retailPrices.map((option, index) => (
@@ -57,12 +60,18 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose, on
                     onAddToCart(product, option);
                     onClose();
                   }}
-                  className="flex items-center justify-between p-4 border-2 border-gray-100 rounded-xl hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 transition-all group"
+                  className="flex items-center justify-between p-4 border-2 border-gray-100 rounded-xl hover:border-amber-500 hover:bg-amber-50 active:bg-amber-100 transition-all group"
                 >
-                  <span className="font-semibold text-lg text-gray-700 group-hover:text-blue-700">
-                    {option.volume} мл
-                  </span>
-                  <span className="font-bold text-xl text-gray-900 group-hover:text-blue-900">
+                  <div className="flex flex-col items-start">
+                    <span className="font-semibold text-lg text-gray-700 group-hover:text-amber-700">
+                      {/* ЗАМІНА ТЕКСТУ ДЛЯ СКЛА */}
+                      {option.volume === 101 ? '100 мл (скло)' : `${option.volume} мл`}
+                    </span>
+                    {option.volume === 101 && (
+                      <span className="text-[10px] text-amber-600 font-bold uppercase">Преміум упаковка</span>
+                    )}
+                  </div>
+                  <span className="font-bold text-xl text-gray-900 group-hover:text-amber-900">
                     {option.price} ₴
                   </span>
                 </button>
