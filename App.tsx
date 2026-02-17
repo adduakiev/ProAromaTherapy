@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Logo } from './components/Logo';
-import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data'; // ПРАВИЛЬНИЙ ІМПОРТ
+import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data';
 import { Product, CartItem } from './types';
 import { Search, ShoppingBasket, Settings } from './components/Icons';
 import { ProductModal } from './components/ProductModal';
@@ -14,7 +14,6 @@ function App() {
   const [exchangeRate, setExchangeRate] = useState(FX_EUR_TO_UAH);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Групування за категоріями
   const groupedProducts = useMemo(() => {
     const lowerTerm = searchTerm.toLowerCase();
     const filtered = PRODUCTS.filter(p => 
@@ -31,12 +30,12 @@ function App() {
     }, {} as Record<string, Product[]>);
   }, [searchTerm]);
 
-  const addToCart = (product: Product, volume: number, price: number) => {
+  const addToCart = (product: Product, option: any) => {
     const newItem: CartItem = {
       id: Math.random().toString(36).substr(2, 9),
       product,
-      selectedVolume: volume,
-      selectedPrice: price
+      selectedVolume: option.volume,
+      selectedPrice: option.price
     };
     setCart([...cart, newItem]);
     setSelectedProduct(null);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShoppingBasket, X, Trash2 } from './Icons';
 import { CartItem } from '../types';
-import { getPackCost } from '../data'; // Імпортуємо функцію для тари
+import { getPackCost } from '../data';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -20,18 +20,14 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate }: Car
 
   const calculateStats = () => {
     return cart.reduce((acc, item) => {
-      const price = item.selectedPrice || 0;
-      const volume = item.selectedVolume || 0;
-      const purchasePriceKg = item.product?.purchasePriceEurPerKg || 0;
+      const price = Number(item.selectedPrice) || 0;
+      const volume = Number(item.selectedVolume) || 0;
+      const purchasePriceKg = Number(item.product?.purchasePriceEurPerKg) || 0;
       
-      // Розрахунок собівартості рідини
       const costProductEur = (purchasePriceKg / 1000) * volume;
       const costProductUah = costProductEur * exchangeRate;
-      
-      // Розрахунок тари через функцію (15 пластик / 25 скло)
       const packCost = getPackCost(volume); 
       
-      // Чистий прибуток
       const profit = price - costProductUah - packCost;
 
       return {
@@ -44,7 +40,7 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate }: Car
   const stats = calculateStats();
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden font-sans">
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
       <div className="absolute inset-y-0 right-0 max-w-full flex">
         <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col">
