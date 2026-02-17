@@ -1,13 +1,14 @@
-import React from 'react';
 import { 
   Search, 
   ShoppingBasket, 
   Settings, 
   X, 
+  Trash2, 
   Plus, 
-  Trash2,
-  Euro,
-  Check
+  Minus, 
+  ChevronRight,
+  Zap,
+  Leaf
 } from 'lucide-react';
 
 export { 
@@ -15,8 +16,10 @@ export {
   ShoppingBasket, 
   Settings, 
   X, 
-  Plus, 
   Trash2, 
-  Euro, 
-  Check 
+  Plus, 
+  Minus, 
+  ChevronRight,
+  Zap,
+  Leaf
 };

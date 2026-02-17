@@ -1,4 +1,3 @@
-cat << 'EOF' > components/CartDrawer.tsx
 import React from 'react';
 import { ShoppingBasket, X, Trash2, Zap } from './Icons';
 import { CartItem } from '../types';
@@ -48,9 +47,9 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate }: Car
       
       <div className="absolute inset-y-0 right-0 max-w-full flex">
         <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col border-l border-slate-200">
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 font-sans">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-[#D4A373] rounded-xl shadow-lg shadow-orange-100">
+              <div className="p-2 bg-[#D4A373] rounded-xl shadow-lg">
                 <ShoppingBasket className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -60,13 +59,13 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate }: Car
             </div>
             <button 
               onClick={onClose} 
-              className="p-2 hover:bg-white hover:shadow-md rounded-full transition-all text-slate-400 hover:text-slate-600"
+              className="p-2 hover:bg-white hover:shadow-md rounded-full transition-all text-slate-400"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar font-sans">
             {cart.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-30">
                 <ShoppingBasket className="w-16 h-16 text-slate-200" />
@@ -102,7 +101,7 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate }: Car
           </div>
 
           {cart.length > 0 && (
-            <div className="p-8 bg-slate-50 border-t border-slate-200 space-y-6">
+            <div className="p-8 bg-slate-50 border-t border-slate-200 space-y-6 font-sans">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Сума</p>
@@ -127,4 +126,3 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate }: Car
     </div>
   );
 }
-EOF
