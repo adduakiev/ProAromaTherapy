@@ -7,12 +7,16 @@ export interface RetailPriceOption {
 
 export interface Product {
   id: string;
-  name: string; // Main display name
+  code?: string;
+  name: string; // Main display name (UA)
+  nameRu?: string;
+  latinName?: string;
   keywords: string; // String containing RU, UA, Latin names for search
   type: ProductType;
-  origin?: string; // Only for oils
+  rawMaterial?: string;
+  origin?: string; 
   retailPrices: RetailPriceOption[];
-  purchasePriceEur: number; // Cost in EUR per 1000ml (1 Litre/Kg)
+  purchasePriceEurPerKg: number | null; // Cost in EUR per 1000ml (1 Litre/Kg)
 }
 
 export interface CartItem {

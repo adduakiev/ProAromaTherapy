@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Logo } from './components/Logo';
-import { PRODUCTS } from './data';
+import { PRODUCTS, FX_EUR_TO_UAH, PACK_COST_UAH } from './data';
 import { Product, CartItem, RetailPriceOption } from './types';
 import { Search, ShoppingBasket, Settings, Euro, Check } from './components/Icons';
 import { ProductModal } from './components/ProductModal';
@@ -14,12 +14,12 @@ function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [exchangeRate, setExchangeRate] = useState(52); // Default 52
+  const [exchangeRate, setExchangeRate] = useState(FX_EUR_TO_UAH || 52); // Use default from data or 52
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Filter and Sort Logic
   const filteredProducts = useMemo(() => {
-    if (!searchTerm) return PRODUCTS; // Show all by default (or change to [] to hide)
+    if (!searchTerm) return PRODUCTS; // Show all by default
 
     const lowerTerm = searchTerm.toLowerCase();
     
@@ -44,8 +44,6 @@ function App() {
       selectedPrice: option.price
     };
     setCart(prev => [...prev, newItem]);
-    // Optionally clear search or keep it open
-    // setSearchTerm(''); 
   };
 
   const removeFromCart = (cartId: string) => {
@@ -56,13 +54,25 @@ function App() {
   const totalRevenue = cart.reduce((sum, item) => sum + item.selectedPrice, 0);
   
   const totalProfit = cart.reduce((sum, item) => {
-    // Purchase Price logic:
-    // item.product.purchasePriceEur is price per 1000ml.
-    // Cost in EUR = (purchasePriceEur / 1000) * volume
-    // Cost in UAH = Cost in EUR * exchangeRate
-    const costEur = (item.product.purchasePriceEur / 1000) * item.selectedVolume;
-    const costUah = costEur * exchangeRate;
-    const profit = item.selectedPrice - costUah;
+    // 1. Calculate Cost of Oil/Hydrolat in EUR
+    // item.product.purchasePriceEurPerKg is price per 1000ml/g
+    let costProductEur = 0;
+    if (item.product.purchasePriceEurPerKg) {
+        costProductEur = (item.product.purchasePriceEurPerKg / 1000) * item.selectedVolume;
+    }
+
+    // 2. Convert Product Cost to UAH
+    const costProductUah = costProductEur * exchangeRate;
+
+    // 3. Add Packing Cost (Bottle + Label etc)
+    // PACK_COST_UAH keys are numbers (volumes)
+    const packCost = PACK_COST_UAH[item.selectedVolume] || 0;
+
+    // 4. Calculate Profit
+    // If purchase price is missing (null), assume 0 cost for product (profit = price - pack), 
+    // or arguably we might want to flag this. For now, we calculate what we can.
+    const profit = item.selectedPrice - costProductUah - packCost;
+    
     return sum + profit;
   }, 0);
 
@@ -81,7 +91,7 @@ function App() {
             </div>
             <input
               type="text"
-              placeholder="Пошук (напр. Роза, Троянда, Rose)..."
+              placeholder="Пошук (напр. Роза, Лаванда)..."
               className="block w-full pl-12 pr-4 py-4 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 bg-white text-lg placeholder-gray-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -128,23 +138,32 @@ function App() {
               }`}
             >
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-800">
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-gray-800 leading-tight">
                     {product.name}
-                    {product.type === 'oil' && (
-                      <span className="text-amber-600 font-normal ml-1">
-                        / {product.origin || 'N/A'}
+                  </h3>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                     {product.latinName && (
+                      <span className="text-xs text-gray-500 italic">
+                        {product.latinName}
                       </span>
                     )}
-                  </h3>
-                  <p className="text-xs text-gray-400 uppercase mt-1">
-                    {product.type === 'oil' ? 'Ефірна олія' : 'Гідролат'}
-                  </p>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                     <span className="text-[10px] uppercase font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+                        {product.type === 'oil' ? 'Ефірна олія' : 'Гідролат'}
+                     </span>
+                     {product.rawMaterial && (
+                        <span className="text-[10px] text-gray-400">
+                           • {product.rawMaterial}
+                        </span>
+                     )}
+                  </div>
                 </div>
                 {product.type === 'oil' ? (
-                  <div className="w-2 h-2 rounded-full bg-amber-500 mt-2"></div>
+                  <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 shrink-0"></div>
                 ) : (
-                   <div className="w-2 h-2 rounded-full bg-teal-500 mt-2"></div>
+                   <div className="w-2 h-2 rounded-full bg-teal-500 mt-2 shrink-0"></div>
                 )}
               </div>
             </div>
