@@ -99,7 +99,7 @@ function App() {
                     <div className="text-right flex gap-1">
                       {product.retailPrices.map(rp => (
                         <span key={rp.volume} className="text-[10px] px-2 py-1 bg-slate-50 text-slate-600 rounded-md border border-slate-100">
-                           {rp.volume === 101 ? '100 мл (скло)' : `${rp.volume} мл`}
+                           {rp.volume === 101 ? '100 мл (G)' : `${rp.volume} мл`}
                         </span>
                       ))}
                     </div>
