@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShoppingBasket, X, Trash2 } from './Icons';
 import { CartItem } from '../types';
-import { getPackCost } from '../data'; // Імпортуємо функцію
+import { getPackCost } from '../data'; // Імпортуємо функцію для тари
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -18,27 +18,28 @@ export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate }: Car
     setCart(cart.filter(item => item.id !== id));
   };
 
-  // Усередині функції calculateStats:
-const calculateStats = () => {
-  return cart.reduce((acc, item) => {
-    const price = item.selectedPrice || 0;
-    const volume = item.selectedVolume || 0;
-    const purchasePriceKg = item.product?.purchasePriceEurPerKg || 0;
-    
-    const costProductEur = (purchasePriceKg / 1000) * volume;
-    const costProductUah = costProductEur * exchangeRate;
-    
-    // ВИКЛИКАЄМО ФУНКЦІЮ ЗАМІСТЬ ОБ'ЄКТА
-    const packCost = getPackCost(volume); 
-    
-    const profit = price - costProductUah - packCost;
+  const calculateStats = () => {
+    return cart.reduce((acc, item) => {
+      const price = item.selectedPrice || 0;
+      const volume = item.selectedVolume || 0;
+      const purchasePriceKg = item.product?.purchasePriceEurPerKg || 0;
+      
+      // Розрахунок собівартості рідини
+      const costProductEur = (purchasePriceKg / 1000) * volume;
+      const costProductUah = costProductEur * exchangeRate;
+      
+      // Розрахунок тари через функцію (15 пластик / 25 скло)
+      const packCost = getPackCost(volume); 
+      
+      // Чистий прибуток
+      const profit = price - costProductUah - packCost;
 
-    return {
-      total: acc.total + price,
-      profit: acc.profit + profit
-    };
-  }, { total: 0, profit: 0 });
-};
+      return {
+        total: acc.total + price,
+        profit: acc.profit + profit
+      };
+    }, { total: 0, profit: 0 });
+  };
 
   const stats = calculateStats();
 
@@ -58,26 +59,33 @@ const calculateStats = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
-            {cart.map((item) => (
-              <div key={item.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <div className="flex-1">
-                  <h4 className="font-bold text-slate-800">{item.product?.name}</h4>
-                  <p className="text-xs text-slate-500">
-                    {item.selectedVolume === 101 ? '100 мл (скло)' : `${item.selectedVolume} мл`} — {item.selectedPrice} грн
-                  </p>
+            {cart.length === 0 ? (
+              <div className="text-center py-20 text-slate-400">Кошик порожній</div>
+            ) : (
+              cart.map((item) => (
+                <div key={item.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-slate-800">{item.product?.name}</h4>
+                    <p className="text-xs text-slate-500">
+                      {item.selectedVolume === 101 ? '100 мл (скло)' : `${item.selectedVolume} мл`} — {item.selectedPrice} грн
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => removeItem(item.id)} 
+                    className="ml-4 p-2 text-slate-300 hover:text-red-500 transition-all"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                 </div>
-                <button onClick={() => removeItem(item.id)} className="ml-4 p-2 text-slate-300 hover:text-red-500 transition-all">
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {cart.length > 0 && (
             <div className="p-6 bg-white border-t border-slate-100 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                  <p className="text-[10px] font-black uppercase text-slate-400 mb-1">Сума</p>
+                  <p className="text-[10px] font-black uppercase text-slate-400 mb-1">Загальна сума</p>
                   <p className="text-2xl font-black text-slate-800">{stats.total} грн</p>
                 </div>
                 <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
