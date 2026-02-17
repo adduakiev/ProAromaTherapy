@@ -42,18 +42,22 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 font-sans antialiased text-slate-900">
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200 px-4 py-3">
+    <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans antialiased text-slate-800">
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#F8F3EF_0%,#FDFBF9_100%)] pointer-events-none" />
+
+      <header className="sticky top-0 z-30 bg-white/40 backdrop-blur-md border-b border-orange-50/50 px-4 py-4">
         <div className="max-w-md mx-auto flex items-center justify-between gap-4">
-          <Logo />
-          <div className="flex items-center gap-3">
-            <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-xl hover:bg-slate-100 text-slate-500">
-              <Settings className="w-6 h-6" />
+          <div className="opacity-80 hover:opacity-100 transition-opacity">
+            <Logo />
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white/60 text-slate-400 transition-colors">
+              <Settings className="w-5 h-5" />
             </button>
-            <button onClick={() => setIsCartOpen(true)} className="relative p-2.5 rounded-xl bg-slate-900 text-white shadow-lg active:scale-95 transition-transform">
-              <ShoppingBasket className="w-6 h-6" />
+            <button onClick={() => setIsCartOpen(true)} className="relative p-3 rounded-full bg-[#E8E0D9] text-slate-700 shadow-sm hover:shadow-md active:scale-95 transition-all">
+              <ShoppingBasket className="w-5 h-5" />
               {cart.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-900 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+                <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
                   {cart.length}
                 </span>
               )}
@@ -61,45 +65,45 @@ function App() {
           </div>
         </div>
 
-        <div className="max-w-md mx-auto mt-4 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <div className="max-w-md mx-auto mt-6 relative">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
           <input
             type="text"
-            placeholder="Пошук олії або властивості..."
+            placeholder="Знайти аромат..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-amber-400/50 transition-all placeholder:text-slate-400"
+            className="w-full pl-12 pr-4 py-4 bg-white/50 border border-orange-50/50 rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/30 transition-all placeholder:text-slate-300 text-sm shadow-inner"
           />
         </div>
       </header>
 
-      <main className="max-w-md mx-auto px-4 mt-6">
-        {isSettingsOpen && (
-          <div className="mb-6 p-4 bg-amber-50 rounded-2xl border border-amber-100">
-            <label className="block text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">Курс EUR/UAH</label>
-            <input type="number" value={exchangeRate} onChange={(e) => setExchangeRate(Number(e.target.value))} className="w-full bg-white border-amber-200 rounded-xl px-4 py-2 text-lg font-semibold" />
-          </div>
-        )}
-
-        <div className="space-y-8">
+      <main className="max-w-md mx-auto px-4 mt-8 relative z-10">
+        <div className="space-y-12">
           {Object.entries(groupedProducts).map(([category, items]) => (
             <section key={category}>
-              <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-4 ml-1 flex items-center gap-2">
-                <span className={`w-1.5 h-1.5 rounded-full ${category === 'Ефірні олії' ? 'bg-amber-400' : 'bg-teal-400'}`} />
-                {category}
-              </h2>
-              <div className="grid gap-3">
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="h-px w-8 bg-orange-100" />
+                <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#A69080]">{category}</h2>
+                <div className="h-px w-8 bg-orange-100" />
+              </div>
+              <div className="grid gap-4">
                 {items.map(product => (
-                  <button key={product.id} onClick={() => setSelectedProduct(product)} className="w-full text-left p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-amber-200 hover:shadow-md transition-all flex justify-between items-center">
+                  <button 
+                    key={product.id} 
+                    onClick={() => setSelectedProduct(product)} 
+                    className="w-full text-left p-5 bg-white/70 backdrop-blur-[2px] rounded-[1.8rem] border border-white shadow-[0_4px_20px_-4px_rgba(232,224,217,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(232,224,217,0.5)] transition-all flex justify-between items-center group"
+                  >
                     <div>
-                      <h3 className="font-bold text-slate-800">{product.name}</h3>
-                      <p className="text-xs text-slate-400 italic mt-0.5">{product.latinName}</p>
+                      <h3 className="font-medium text-slate-800 text-[15px] group-hover:text-[#D4A373] transition-colors">{product.name}</h3>
+                      <p className="text-[11px] text-slate-400 italic mt-0.5 font-serif opacity-70">{product.latinName}</p>
                     </div>
-                    <div className="text-right flex gap-1">
+                    <div className="flex -space-x-1">
                       {product.retailPrices.map(rp => (
-                        <span key={rp.volume} className="text-[10px] px-2 py-1 bg-slate-50 text-slate-600 rounded-md border border-slate-100">
-                           {rp.volume === 101 ? '100 мл (G)' : `${rp.volume} мл`}
-                        </span>
+                        <div key={rp.volume} className="w-8 h-8 rounded-full bg-[#F8F3EF] border-2 border-white flex items-center justify-center shadow-sm">
+                          <span className="text-[8px] font-bold text-[#A69080]">
+                            {rp.volume === 101 ? 'G' : rp.volume}
+                          </span>
+                        </div>
                       ))}
                     </div>
                   </button>
