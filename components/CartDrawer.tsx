@@ -1,106 +1,107 @@
 import React from 'react';
+import { ShoppingBasket, X, Trash2 } from './Icons';
 import { CartItem } from '../types';
-import { X, Trash2, ShoppingBasket } from './Icons';
 
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  items: CartItem[];
-  onRemove: (cartId: string) => void;
-  totalRevenue: number;
-  totalProfit: number;
+  cart: CartItem[];
+  setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   exchangeRate: number;
+  packCosts: Record<number, number>;
 }
 
-export const CartDrawer: React.FC<CartDrawerProps> = ({
-  isOpen,
-  onClose,
-  items,
-  onRemove,
-  totalRevenue,
-  totalProfit,
-  exchangeRate
-}) => {
+export function CartDrawer({ isOpen, onClose, cart, setCart, exchangeRate, packCosts }: CartDrawerProps) {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity" 
-        onClick={onClose}
-      />
-      
-      {/* Drawer */}
-      <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-        <div className="p-4 border-b flex justify-between items-center bg-gray-50">
-          <div className="flex items-center gap-2">
-            <ShoppingBasket className="text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-800">Кошик</h2>
-            <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">
-              {items.length}
-            </span>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-            <X size={24} className="text-gray-600" />
-          </button>
-        </div>
+  const removeItem = (id: string) => {
+    setCart(cart.filter(item => item.id !== id));
+  };
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {items.length === 0 ? (
-            <div className="text-center py-20 text-gray-400">
-              <ShoppingBasket size={64} className="mx-auto mb-4 opacity-20" />
-              <p>Кошик порожній</p>
+  // Безпечний розрахунок прибутку
+  const calculateStats = () => {
+    return cart.reduce((acc, item) => {
+      const price = item.selectedPrice || 0;
+      const volume = item.selectedVolume || 0;
+      // Перевірка на наявність ціни закупівлі
+      const purchasePriceKg = item.product?.purchasePriceEurPerKg || 0;
+      
+      const costProductEur = (purchasePriceKg / 1000) * volume;
+      const costProductUah = costProductEur * exchangeRate;
+      const packCost = packCosts[volume] || 0;
+      
+      const profit = price - costProductUah - packCost;
+
+      return {
+        total: acc.total + price,
+        profit: acc.profit + profit
+      };
+    }, { total: 0, profit: 0 });
+  };
+
+  const stats = calculateStats();
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+      
+      <div className="absolute inset-y-0 right-0 max-w-full flex">
+        <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ShoppingBasket className="w-6 h-6 text-amber-500" />
+              <h2 className="text-xl font-bold text-slate-800">Кошик</h2>
             </div>
-          ) : (
-            items.map((item) => (
-              <div key={item.cartId} className="flex justify-between items-center p-3 bg-white border rounded-xl shadow-sm">
-                <div>
-                  <h3 className="font-semibold text-gray-800">{item.product.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {item.selectedVolume} мл 
-                    <span className="mx-2 text-gray-300">|</span> 
-                    {item.product.type === 'oil' ? 'Олія' : 'Гідролат'}
-                  </p>
+            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+              <X className="w-6 h-6 text-slate-400" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
+            {cart.length === 0 ? (
+              <div className="text-center py-20">
+                <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ShoppingBasket className="w-10 h-10 text-slate-200" />
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-bold text-lg">{item.selectedPrice} ₴</span>
+                <p className="text-slate-400 font-medium">Кошик порожній</p>
+              </div>
+            ) : (
+              cart.map((item) => (
+                <div key={item.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div>
+                    <h4 className="font-bold text-slate-800">{item.product.name}</h4>
+                    <p className="text-xs text-slate-500">{item.selectedVolume} мл — {item.selectedPrice} грн</p>
+                  </div>
                   <button 
-                    onClick={() => onRemove(item.cartId)}
-                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                    onClick={() => removeItem(item.id)}
+                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                   >
-                    <Trash2 size={20} />
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
+              ))
+            )}
+          </div>
+
+          {cart.length > 0 && (
+            <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Сума</p>
+                  <p className="text-2xl font-black text-slate-800">{stats.total} <span className="text-sm font-normal text-slate-400">грн</span></p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Прибуток</p>
+                  <p className="text-2xl font-black text-emerald-500">{Math.round(stats.profit)} <span className="text-sm font-normal text-slate-400">грн</span></p>
+                </div>
               </div>
-            ))
-          )}
-        </div>
-
-        <div className="p-6 bg-gray-50 border-t space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Сума для клієнта:</span>
-            <span className="text-2xl font-bold text-gray-900">{totalRevenue.toFixed(0)} ₴</span>
-          </div>
-          
-          <div className="pt-4 border-t border-gray-200">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-500">Ваш заробіток:</span>
-              <span className="text-xl font-bold text-green-600">+{totalProfit.toFixed(0)} ₴</span>
+              <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold shadow-lg shadow-slate-200 active:scale-[0.98] transition-transform">
+                Оформити замовлення
+              </button>
             </div>
-            <p className="text-xs text-right text-gray-400 mt-1">
-              (Курс: {exchangeRate} ₴/€)
-            </p>
-          </div>
-
-          <button 
-            className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-[0.98] transition-transform"
-            onClick={() => alert("Замовлення сформовано!")}
-          >
-            Оформити замовлення
-          </button>
+          )}
         </div>
       </div>
     </div>
   );
-};
+}
