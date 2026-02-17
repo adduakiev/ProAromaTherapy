@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { Logo } from './components/Logo';
-import { PRODUCTS, FX_EUR_TO_UAH, PACK_COST_UAH } from './data';
+import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data';
 import { Product, CartItem } from './types';
 import { Search, ShoppingBasket, Settings } from './components/Icons';
 import { ProductModal } from './components/ProductModal';
 import { CartDrawer } from './components/CartDrawer';
+
+
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
