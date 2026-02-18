@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Logo } from './components/Logo';
-import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data';
+import { PRODUCTS, FX_EUR_TO_UAH, COSTS } from './data';
 import { Product, CartItem } from './types';
 import { Search, ShoppingBasket, Settings, X } from './components/Icons';
 import { ProductModal } from './components/ProductModal';
@@ -11,30 +11,26 @@ function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [exchangeRate, setExchangeRate] = useState(FX_EUR_TO_UAH);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
+  // Стани налаштувань
+  const [exchangeRate, setExchangeRate] = useState(FX_EUR_TO_UAH);
+  const [costs, setCosts] = useState(COSTS);
+  
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-
-  // Референс для поля пошуку
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const controlNavbar = () => {
       if (typeof window !== 'undefined') {
         const currentScrollY = window.scrollY;
-        if (currentScrollY < 20) {
-          setIsVisible(true);
-        } else if (currentScrollY > lastScrollY && currentScrollY > 80) {
-          setIsVisible(false);
-        } else if (currentScrollY < lastScrollY) {
-          setIsVisible(true);
-        }
+        if (currentScrollY < 20) setIsVisible(true);
+        else if (currentScrollY > lastScrollY && currentScrollY > 80) setIsVisible(false);
+        else if (currentScrollY < lastScrollY) setIsVisible(true);
         setLastScrollY(currentScrollY);
       }
     };
-
     window.addEventListener('scroll', controlNavbar, { passive: true });
     return () => window.removeEventListener('scroll', controlNavbar);
   }, [lastScrollY]);
@@ -46,7 +42,6 @@ function App() {
       p.name.toLowerCase().includes(lowerTerm) ||
       p.latinName.toLowerCase().includes(lowerTerm)
     );
-
     return filtered.reduce((acc, product) => {
       const typeLabel = product.type === 'oil' ? 'Ефірні олії' : 'Гідролати';
       if (!acc[typeLabel]) acc[typeLabel] = [];
@@ -66,84 +61,60 @@ function App() {
     setSelectedProduct(null);
   };
 
-  // Функція очищення з поверненням фокусу
-  const handleClearSearch = () => {
-    setSearchTerm('');
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans antialiased text-slate-800">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#F8F3EF_0%,#FDFBF9_100%)] pointer-events-none" />
 
       <header className="sticky top-0 z-30 px-4 py-4 transition-all duration-300">
         <div className="max-w-md mx-auto flex flex-col">
-          
-          <div className={`grid transition-all duration-500 ease-in-out ${
-            isVisible ? 'grid-rows-[1fr] opacity-100 mb-4' : 'grid-rows-[0fr] opacity-0 mb-0'
-          }`}>
+          <div className={`grid transition-all duration-500 ease-in-out ${isVisible ? 'grid-rows-[1fr] opacity-100 mb-4' : 'grid-rows-[0fr] opacity-0 mb-0'}`}>
             <div className="overflow-hidden">
               <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-[2.5rem] p-3 shadow-sm flex items-center justify-between gap-4">
-                <div className="pl-3 opacity-90">
-                  <Logo />
-                </div>
+                <div className="pl-3 opacity-90"><Logo /></div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400 transition-all">
                     <Settings className="w-5 h-5" />
                   </button>
                   <button onClick={() => setIsCartOpen(true)} className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg active:scale-95 transition-all">
                     <ShoppingBasket className="w-5 h-5" />
-                    {cart.length > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FDFBF9]">
-                        {cart.length}
-                      </span>
-                    )}
+                    {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FDFBF9]">{cart.length}</span>}
                   </button>
                 </div>
               </div>
             </div>
           </div>
-
-          <div className={`relative group transition-transform duration-500 ease-in-out ${
-            !isVisible ? '-translate-y-2' : 'translate-y-0'
-          }`}>
+          <div className={`relative group transition-transform duration-500 ease-in-out ${!isVisible ? '-translate-y-2' : 'translate-y-0'}`}>
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#D4A373] transition-colors" />
-            
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Знайти магію рослин..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-12 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm outline-none"
-            />
-
-            {searchTerm && (
-              <button
-                onClick={handleClearSearch}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-100/50 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-all active:scale-90"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+            <input ref={searchInputRef} type="text" placeholder="Знайти магію рослин..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-12 pr-12 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm outline-none" />
+            {searchTerm && <button onClick={() => { setSearchTerm(''); searchInputRef.current?.focus(); }} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-100/50 text-slate-400 hover:text-slate-600 transition-all"><X className="w-4 h-4" /></button>}
           </div>
         </div>
       </header>
 
       <main className="max-w-md mx-auto px-4 mt-4 relative z-10">
         {isSettingsOpen && (
-          <div className="mb-8 p-6 bg-white/60 backdrop-blur-sm rounded-[2rem] border border-white shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
-            <label className="block text-[10px] font-black text-[#D4A373] uppercase tracking-[0.2em] mb-3 text-center text-slate-400">Налаштування курсу</label>
-            <div className="relative">
-              <input 
-                type="number" 
-                value={exchangeRate} 
-                onChange={(e) => setExchangeRate(Number(e.target.value))} 
-                className="w-full bg-white/80 border-none rounded-2xl px-4 py-3 text-center text-xl font-light text-slate-600 focus:ring-2 focus:ring-orange-100 outline-none" 
-              />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-300 uppercase">UAH</span>
+          <div className="mb-8 p-6 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-xl animate-in fade-in slide-in-from-top-4 duration-300">
+            <h3 className="text-center text-[11px] font-black uppercase tracking-widest text-[#D4A373] mb-6">Налаштування витрат</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center bg-white/50 p-3 rounded-2xl">
+                <span className="text-xs font-bold text-slate-500">Курс EUR</span>
+                <input type="number" value={exchangeRate} onChange={(e) => setExchangeRate(Number(e.target.value))} className="w-16 bg-white border-none rounded-lg text-right font-bold text-slate-700 outline-none p-1 focus:ring-1 focus:ring-orange-200" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Пластик', key: 'plasticPack' },
+                  { label: 'Скло', key: 'glassPack' },
+                  { label: 'Етикетка фл.', key: 'label' },
+                  { label: 'Папір ежик', key: 'packingPaper' },
+                  { label: 'Коробка', key: 'shippingBox' },
+                  { label: 'Етикетка кор.', key: 'boxLabel' }
+                ].map(item => (
+                  <div key={item.key} className="flex flex-col bg-white/50 p-2 rounded-xl">
+                    <span className="text-[9px] font-black uppercase text-slate-400 mb-1">{item.label}</span>
+                    <input type="number" value={costs[item.key as keyof typeof costs]} onChange={(e) => setCosts({...costs, [item.key]: Number(e.target.value)})} className="bg-transparent border-none font-bold text-slate-700 outline-none p-0 focus:ring-0" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -158,11 +129,7 @@ function App() {
               </div>
               <div className="grid gap-4">
                 {items.map(product => (
-                  <button 
-                    key={product.id} 
-                    onClick={() => setSelectedProduct(product)} 
-                    className="w-full text-left p-5 bg-white/70 backdrop-blur-[2px] rounded-[2rem] border border-white shadow-[0_4px_20px_-4px_rgba(232,224,217,0.2)] hover:shadow-[0_8px_30px_-4px_rgba(232,224,217,0.4)] hover:bg-white transition-all flex justify-between items-center group active:scale-[0.98]"
-                  >
+                  <button key={product.id} onClick={() => setSelectedProduct(product)} className="w-full text-left p-5 bg-white/70 backdrop-blur-[2px] rounded-[2rem] border border-white shadow-sm hover:shadow-md transition-all flex justify-between items-center group active:scale-[0.98]">
                     <div>
                       <h3 className="font-medium text-slate-800 text-[15px] group-hover:text-[#D4A373] transition-colors">{product.name}</h3>
                       <p className="text-[11px] text-slate-400 italic mt-0.5 font-serif opacity-70">{product.latinName}</p>
@@ -170,9 +137,7 @@ function App() {
                     <div className="flex -space-x-1.5">
                       {product.retailPrices.map(rp => (
                         <div key={rp.volume} className="w-8 h-8 rounded-full bg-[#F8F3EF] border-2 border-white flex items-center justify-center shadow-sm">
-                          <span className="text-[8px] font-bold text-[#A69080]">
-                            {rp.volume === 101 ? 'G' : rp.volume}
-                          </span>
+                          <span className="text-[8px] font-bold text-[#A69080]">{rp.volume === 101 ? 'G' : rp.volume}</span>
                         </div>
                       ))}
                     </div>
@@ -184,21 +149,8 @@ function App() {
         </div>
       </main>
 
-      {selectedProduct && (
-        <ProductModal 
-          product={selectedProduct} 
-          onClose={() => setSelectedProduct(null)}
-          onAddToCart={addToCart}
-        />
-      )}
-      
-      <CartDrawer 
-        isOpen={isCartOpen} 
-        onClose={() => setIsCartOpen(false)}
-        cart={cart}
-        setCart={setCart}
-        exchangeRate={exchangeRate}
-      />
+      {selectedProduct && <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} exchangeRate={exchangeRate} costs={costs} />
     </div>
   );
 }
