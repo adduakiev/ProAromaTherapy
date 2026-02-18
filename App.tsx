@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Logo } from './components/Logo';
-import { PRODUCTS, FX_EUR_TO_UAH, COSTS } from './data';
+import { PRODUCTS, FX_EUR_TO_UAH, DEFAULT_COSTS } from './data';
 import { Product, CartItem } from './types';
 import { Search, ShoppingBasket, Settings, X } from './components/Icons';
 import { ProductModal } from './components/ProductModal';
@@ -11,11 +11,8 @@ function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  
-  // Стани налаштувань
   const [exchangeRate, setExchangeRate] = useState(FX_EUR_TO_UAH);
-  const [costs, setCosts] = useState(COSTS);
-  
+  const [costs, setCosts] = useState(DEFAULT_COSTS);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -72,7 +69,7 @@ function App() {
               <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-[2.5rem] p-3 shadow-sm flex items-center justify-between gap-4">
                 <div className="pl-3 opacity-90"><Logo /></div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400 transition-all">
+                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400">
                     <Settings className="w-5 h-5" />
                   </button>
                   <button onClick={() => setIsCartOpen(true)} className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg active:scale-95 transition-all">
@@ -93,27 +90,41 @@ function App() {
 
       <main className="max-w-md mx-auto px-4 mt-4 relative z-10">
         {isSettingsOpen && (
-          <div className="mb-8 p-6 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-xl animate-in fade-in slide-in-from-top-4 duration-300">
-            <h3 className="text-center text-[11px] font-black uppercase tracking-widest text-[#D4A373] mb-6">Налаштування витрат</h3>
-            <div className="space-y-4">
+          <div className="mb-8 p-6 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-xl">
+            <h3 className="text-center text-[10px] font-black uppercase tracking-widest text-[#D4A373] mb-6">Налаштування бізнесу</h3>
+            <div className="space-y-6">
               <div className="flex justify-between items-center bg-white/50 p-3 rounded-2xl">
-                <span className="text-xs font-bold text-slate-500">Курс EUR</span>
-                <input type="number" value={exchangeRate} onChange={(e) => setExchangeRate(Number(e.target.value))} className="w-16 bg-white border-none rounded-lg text-right font-bold text-slate-700 outline-none p-1 focus:ring-1 focus:ring-orange-200" />
+                <span className="text-xs font-bold text-slate-500 tracking-tight">Курс EUR (€)</span>
+                <input type="number" value={exchangeRate} onChange={(e) => setExchangeRate(Number(e.target.value))} className="w-20 bg-white border-none rounded-xl text-right font-bold text-slate-800 outline-none p-2 shadow-sm" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: 'Пластик', key: 'plasticPack' },
-                  { label: 'Скло', key: 'glassPack' },
-                  { label: 'Етикетка фл.', key: 'label' },
-                  { label: 'Папір ежик', key: 'packingPaper' },
-                  { label: 'Коробка', key: 'shippingBox' },
-                  { label: 'Етикетка кор.', key: 'boxLabel' }
-                ].map(item => (
-                  <div key={item.key} className="flex flex-col bg-white/50 p-2 rounded-xl">
-                    <span className="text-[9px] font-black uppercase text-slate-400 mb-1">{item.label}</span>
-                    <input type="number" value={costs[item.key as keyof typeof costs]} onChange={(e) => setCosts({...costs, [item.key]: Number(e.target.value)})} className="bg-transparent border-none font-bold text-slate-700 outline-none p-0 focus:ring-0" />
-                  </div>
-                ))}
+
+              <div className="space-y-3">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Тара Олії (3 / 5 / 15 мл)</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {['oil3', 'oil5', 'oil15'].map(k => (
+                    <input key={k} type="number" value={costs[k as keyof typeof costs]} onChange={(e) => setCosts({...costs, [k]: Number(e.target.value)})} className="w-full bg-white border-none rounded-xl p-2 text-center font-bold text-slate-700 shadow-sm" />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Тара Гідролати (100P / 100G / 200 / 500 мл)</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {['hydro100p', 'hydro100g', 'hydro200', 'hydro500'].map(k => (
+                    <input key={k} type="number" value={costs[k as keyof typeof costs]} onChange={(e) => setCosts({...costs, [k]: Number(e.target.value)})} className="w-full bg-white border-none rounded-xl p-2 text-center font-bold text-slate-700 shadow-sm" />
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <p className="text-[9px] font-black text-slate-400 uppercase">Етикетка фл.</p>
+                  <input type="number" value={costs.label} onChange={(e) => setCosts({...costs, label: Number(e.target.value)})} className="w-full bg-white border-none rounded-xl p-2 text-center font-bold text-slate-700 shadow-sm" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[9px] font-black text-slate-400 uppercase">Коробка крафт</p>
+                  <input type="number" value={costs.shippingBox} onChange={(e) => setCosts({...costs, shippingBox: Number(e.target.value)})} className="w-full bg-white border-none rounded-xl p-2 text-center font-bold text-slate-700 shadow-sm" />
+                </div>
               </div>
             </div>
           </div>
@@ -123,9 +134,7 @@ function App() {
           {Object.entries(groupedProducts).map(([category, items]) => (
             <section key={category}>
               <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="h-px w-6 bg-[#E8E0D9]" />
-                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#A69080]">{category}</h2>
-                <div className="h-px w-6 bg-[#E8E0D9]" />
+                <div className="h-px w-6 bg-[#E8E0D9]" /><h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#A69080]">{category}</h2><div className="h-px w-6 bg-[#E8E0D9]" />
               </div>
               <div className="grid gap-4">
                 {items.map(product => (
