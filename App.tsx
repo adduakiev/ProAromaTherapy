@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Logo } from './components/Logo';
 import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data';
 import { Product, CartItem } from './types';
@@ -16,6 +16,9 @@ function App() {
   
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Референс для поля пошуку
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const controlNavbar = () => {
@@ -63,6 +66,14 @@ function App() {
     setSelectedProduct(null);
   };
 
+  // Функція очищення з поверненням фокусу
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans antialiased text-slate-800">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#F8F3EF_0%,#FDFBF9_100%)] pointer-events-none" />
@@ -101,6 +112,7 @@ function App() {
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#D4A373] transition-colors" />
             
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Знайти магію рослин..."
               value={searchTerm}
@@ -108,10 +120,9 @@ function App() {
               className="w-full pl-12 pr-12 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm outline-none"
             />
 
-            {/* Кнопка очищення */}
             {searchTerm && (
               <button
-                onClick={() => setSearchTerm('')}
+                onClick={handleClearSearch}
                 className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-100/50 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-all active:scale-90"
               >
                 <X className="w-4 h-4" />
