@@ -1,27 +1,32 @@
-export type ProductType = 'oil' | 'hydrolat';
-
-export interface RetailPriceOption {
-  volume: number; // volume in ml
-  price: number;  // price in UAH
-}
-
 export interface Product {
   id: string;
-  code?: string;
-  name: string; // Main display name (UA)
-  nameRu?: string;
-  latinName?: string;
-  keywords: string; // String containing RU, UA, Latin names for search
-  type: ProductType;
-  rawMaterial?: string;
-  origin?: string; 
-  retailPrices: RetailPriceOption[];
-  purchasePriceEurPerKg: number | null; // Cost in EUR per 1000ml (1 Litre/Kg)
+  code: string;
+  name: string;
+  latinName: string;
+  type: 'oil' | 'hydrolat';
+  rawMaterial: string;
+  purchasePriceEurPerKg: number;
+  retailPrices: { volume: number; price: number }[];
+  keywords: string;
 }
 
 export interface CartItem {
-  cartId: string;
+  id: string;
   product: Product;
   selectedVolume: number;
   selectedPrice: number;
+}
+
+export interface Order {
+  id: string;
+  date: string;
+  customer: {
+    name: string;
+    phone: string;
+    np: string;
+  };
+  items: CartItem[];
+  total: number;
+  profit: number;
+  status: 'draft' | 'shipped';
 }
