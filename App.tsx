@@ -21,17 +21,11 @@ function App() {
     const controlNavbar = () => {
       if (typeof window !== 'undefined') {
         const currentScrollY = window.scrollY;
-
-        // 1. Якщо ми в самому верху (менше 10px) — завжди показуємо
-        if (currentScrollY < 10) {
+        if (currentScrollY < 20) {
           setIsVisible(true);
-        } 
-        // 2. Якщо скролимо вниз більше ніж на 5px — ховаємо логотип
-        else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        } else if (currentScrollY > lastScrollY && currentScrollY > 80) {
           setIsVisible(false);
-        } 
-        // 3. Якщо скролимо вгору — миттєво повертаємо логотип
-        else if (currentScrollY < lastScrollY) {
+        } else if (currentScrollY < lastScrollY) {
           setIsVisible(true);
         }
         setLastScrollY(currentScrollY);
@@ -73,43 +67,37 @@ function App() {
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans antialiased text-slate-800">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#F8F3EF_0%,#FDFBF9_100%)] pointer-events-none" />
 
-      <header className="sticky top-0 z-30 px-4 py-4">
-        <div className="max-w-md mx-auto">
-          {/* Верхній блок: Лого + Кнопки */}
-          <div className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-            isVisible 
-              ? 'opacity-100 translate-y-0 h-[68px] mb-4 scale-100' 
-              : 'opacity-0 -translate-y-20 h-0 overflow-hidden mb-0 scale-95'
+      <header className="sticky top-0 z-30 px-4 py-4 transition-all duration-300">
+        <div className="max-w-md mx-auto flex flex-col">
+          
+          {/* Контейнер Лого: плавно згортається через grid-rows */}
+          <div className={`grid transition-all duration-500 ease-in-out ${
+            isVisible ? 'grid-rows-[1fr] opacity-100 mb-4' : 'grid-rows-[0fr] opacity-0 mb-0'
           }`}>
-            <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-[2.5rem] p-3 shadow-sm flex items-center justify-between gap-4">
-              <div className="pl-3 opacity-90">
-                <Logo />
-              </div>
-              
-              <div className="flex items-center gap-1">
-                <button 
-                  onClick={() => setIsSettingsOpen(!isSettingsOpen)} 
-                  className="p-2.5 rounded-full hover:bg-white text-slate-400 transition-all"
-                >
-                  <Settings className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => setIsCartOpen(true)} 
-                  className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg shadow-slate-200 active:scale-95 transition-all"
-                >
-                  <ShoppingBasket className="w-5 h-5" />
-                  {cart.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FDFBF9]">
-                      {cart.length}
-                    </span>
-                  )}
-                </button>
+            <div className="overflow-hidden">
+              <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-[2.5rem] p-3 shadow-sm flex items-center justify-between gap-4">
+                <div className="pl-3 opacity-90">
+                  <Logo />
+                </div>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400">
+                    <Settings className="w-5 h-5" />
+                  </button>
+                  <button onClick={() => setIsCartOpen(true)} className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg active:scale-95 transition-all">
+                    <ShoppingBasket className="w-5 h-5" />
+                    {cart.length > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FDFBF9]">
+                        {cart.length}
+                      </span>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Пошук: завжди видимий, плавно піднімається */}
-          <div className={`relative group transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          {/* Пошук: плавно піднімається, коли лого зникає */}
+          <div className={`relative group transition-transform duration-500 ease-in-out ${
             !isVisible ? '-translate-y-2' : 'translate-y-0'
           }`}>
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#D4A373] transition-colors" />
@@ -127,7 +115,7 @@ function App() {
       <main className="max-w-md mx-auto px-4 mt-4 relative z-10">
         {isSettingsOpen && (
           <div className="mb-8 p-6 bg-white/60 backdrop-blur-sm rounded-[2rem] border border-white shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
-            <label className="block text-[10px] font-black text-[#D4A373] uppercase tracking-[0.2em] mb-3 text-center text-slate-400">Налаштування курсу</label>
+            <label className="block text-[10px] font-black text-[#D4A373] uppercase tracking-[0.2em] mb-3 text-center text-slate-400 font-sans">Курс EUR/UAH</label>
             <div className="relative">
               <input 
                 type="number" 
@@ -135,7 +123,7 @@ function App() {
                 onChange={(e) => setExchangeRate(Number(e.target.value))} 
                 className="w-full bg-white/80 border-none rounded-2xl px-4 py-3 text-center text-xl font-light text-slate-600 focus:ring-2 focus:ring-orange-100 outline-none" 
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-300 uppercase">UAH</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-300 uppercase font-sans">UAH</span>
             </div>
           </div>
         )}
@@ -145,7 +133,7 @@ function App() {
             <section key={category}>
               <div className="flex items-center justify-center gap-3 mb-6">
                 <div className="h-px w-6 bg-[#E8E0D9]" />
-                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#A69080]">{category}</h2>
+                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#A69080] font-sans">{category}</h2>
                 <div className="h-px w-6 bg-[#E8E0D9]" />
               </div>
               <div className="grid gap-4">
