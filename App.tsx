@@ -7,6 +7,25 @@ import { ProductModal } from './components/ProductModal';
 import { CartDrawer } from './components/CartDrawer';
 import { OrdersSidebar } from './components/OrdersSidebar';
 
+const ProductCard = React.memo(({ product, onClick }: { product: Product, onClick: (p: Product) => void }) => (
+  <button 
+    onClick={() => onClick(product)} 
+    className="w-full text-left p-5 bg-white/70 backdrop-blur-[2px] rounded-[2rem] border border-white shadow-sm hover:shadow-md transition-all flex justify-between items-center group active:scale-[0.98]"
+  >
+    <div>
+      <h3 className="font-medium text-slate-800 text-[15px] group-hover:text-[#D4A373] transition-colors">{product.name}</h3>
+      <p className="text-[11px] text-slate-400 italic mt-0.5 font-serif opacity-70">{product.latinName}</p>
+    </div>
+    <div className="flex -space-x-1.5">
+      {product.retailPrices.map(rp => (
+        <div key={rp.volume} className="w-8 h-8 rounded-full bg-[#F8F3EF] border-2 border-white flex items-center justify-center shadow-sm">
+          <span className="text-[8px] font-bold text-[#A69080]">{rp.volume === 101 ? 'G' : rp.volume}</span>
+        </div>
+      ))}
+    </div>
+  </button>
+));
+
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -14,9 +33,8 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   
-  // Завантаження замовлень з пам'яті
   const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('aroma_orders');
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('aroma_orders') : null;
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -29,8 +47,8 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Скрол логіка...
   useEffect(() => {
     const controlNavbar = () => {
       const currentScrollY = window.scrollY;
@@ -44,19 +62,35 @@ function App() {
   }, [lastScrollY]);
 
   const groupedProducts = useMemo(() => {
-    const lower = searchTerm.toLowerCase();
-    const filtered = PRODUCTS.filter(p => p.keywords.toLowerCase().includes(lower) || p.name.toLowerCase().includes(lower));
-    return filtered.reduce((acc, p) => {
-      const label = p.type === 'oil' ? 'Ефірні олії' : 'Гідролати';
-      if (!acc[label]) acc[label] = [];
-      acc[label].push(p);
+    const lowerTerm = searchTerm.toLowerCase();
+    const filtered = PRODUCTS.filter(p => 
+      p.keywords.toLowerCase().includes(lowerTerm) || 
+      p.name.toLowerCase().includes(lowerTerm) ||
+      p.latinName.toLowerCase().includes(lowerTerm)
+    );
+    return filtered.reduce((acc, product) => {
+      const typeLabel = product.type === 'oil' ? 'Ефірні олії' : 'Гідролати';
+      if (!acc[typeLabel]) acc[typeLabel] = [];
+      acc[typeLabel].push(product);
       return acc;
-    }, {} as any);
+    }, {} as Record<string, Product[]>);
   }, [searchTerm]);
+
+  const handleProductClick = useCallback((product: Product) => setSelectedProduct(product), []);
+  
+  const addToCart = useCallback((product: Product, option: any) => {
+    setCart(prev => [...prev, {
+      id: Math.random().toString(36).substr(2, 9),
+      product,
+      selectedVolume: option.volume,
+      selectedPrice: option.price
+    }]);
+    setSelectedProduct(null);
+  }, []);
 
   const saveOrder = (orderData: Order) => {
     setOrders([orderData, ...orders]);
-    setCart([]); // Очищуємо кошик після збереження
+    setCart([]);
   };
 
   const deleteOrder = (id: string) => setOrders(orders.filter(o => o.id !== id));
@@ -64,6 +98,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans antialiased text-slate-800">
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#F8F3EF_0%,#FDFBF9_100%)] pointer-events-none" />
+
       <header className="sticky top-0 z-30 px-4 py-4 transition-all duration-300">
         <div className="max-w-md mx-auto flex flex-col">
           <div className={`grid transition-all duration-500 ease-in-out ${isVisible ? 'grid-rows-[1fr] opacity-100 mb-4' : 'grid-rows-[0fr] opacity-0 mb-0'}`}>
@@ -74,7 +110,7 @@ function App() {
                 </button>
                 <div className="opacity-90"><Logo /></div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400 transition-all"><Settings className="w-5 h-5" /></button>
+                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400"><Settings className="w-5 h-5" /></button>
                   <button onClick={() => setIsCartOpen(true)} className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg active:scale-95 transition-all">
                     <ShoppingBasket className="w-5 h-5" />
                     {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FDFBF9]">{cart.length}</span>}
@@ -83,11 +119,67 @@ function App() {
               </div>
             </div>
           </div>
-          {/* Пошук як був... */}
+
+          <div className={`relative group transition-transform duration-500 ease-in-out ${!isVisible ? '-translate-y-2' : 'translate-y-0'}`}>
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#D4A373] transition-colors" />
+            <input 
+              ref={searchInputRef} 
+              type="text" 
+              placeholder="Знайти магію рослин..." 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full pl-12 pr-12 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm outline-none" 
+            />
+            {searchTerm && <button onClick={() => { setSearchTerm(''); searchInputRef.current?.focus(); }} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-100/50 text-slate-400 hover:text-slate-600 transition-all"><X className="w-4 h-4" /></button>}
+          </div>
         </div>
       </header>
 
-      {/* Main content... */}
+      <main className="max-w-md mx-auto px-4 mt-4 relative z-10">
+        {isSettingsOpen && (
+          <div className="mb-8 p-6 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-xl">
+            <h3 className="text-center text-[10px] font-black uppercase tracking-widest text-[#D4A373] mb-6">Налаштування</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center bg-white/50 p-3 rounded-2xl">
+                <span className="text-xs font-bold text-slate-500">Курс EUR (€)</span>
+                <input type="number" value={exchangeRate} onChange={(e) => setExchangeRate(Number(e.target.value))} className="w-20 bg-white border-none rounded-xl text-right font-bold text-slate-800 outline-none p-2 shadow-sm" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: '3 мл Олія', k: 'oil3' }, { label: '5 мл Олія', k: 'oil5' }, { label: '15 мл Олія', k: 'oil15' },
+                  { label: '100P Гідро', k: 'hydro100p' }, { label: '100G Гідро', k: 'hydro100g' }, { label: '200 Гідро', k: 'hydro200' },
+                  { label: '500 Гідро', k: 'hydro500' }, { label: 'Етикетка', k: 'label' }
+                ].map(item => (
+                  <div key={item.k} className="bg-white/50 p-2 rounded-xl border border-white/40">
+                    <p className="text-[8px] font-black text-slate-400 uppercase">{item.label}</p>
+                    <input type="number" value={costs[item.k as keyof typeof costs]} onChange={(e) => setCosts({...costs, [item.k]: Number(e.target.value)})} className="w-full bg-transparent border-none p-0 text-sm font-bold text-slate-700 outline-none" />
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setIsSettingsOpen(false)} className="w-full py-3 bg-[#D4A373] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest mt-2 shadow-lg shadow-orange-100">Зберегти налаштування</button>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-12">
+          {Object.entries(groupedProducts).map(([category, items]) => (
+            <section key={category}>
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="h-px w-6 bg-[#E8E0D9]" />
+                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#A69080]">{category}</h2>
+                <div className="h-px w-6 bg-[#E8E0D9]" />
+              </div>
+              <div className="grid gap-4">
+                {items.map(product => (
+                  <ProductCard key={product.id} product={product} onClick={handleProductClick} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </main>
+
+      {selectedProduct && <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
       
       <CartDrawer 
         isOpen={isCartOpen} 
@@ -105,7 +197,7 @@ function App() {
         orders={orders} 
         onDelete={deleteOrder} 
         onToggleStatus={toggleOrderStatus}
-        onSelect={(o) => console.log('Selected', o)}
+        onSelect={(o) => { console.log(o); setIsOrdersOpen(false); }}
       />
     </div>
   );
