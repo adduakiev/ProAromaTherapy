@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Logo } from './components/Logo';
 import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data';
 import { Product, CartItem } from './types';
-import { Search, ShoppingBasket, Settings } from './components/Icons';
+import { Search, ShoppingBasket, Settings, X } from './components/Icons';
 import { ProductModal } from './components/ProductModal';
 import { CartDrawer } from './components/CartDrawer';
 
@@ -70,7 +70,6 @@ function App() {
       <header className="sticky top-0 z-30 px-4 py-4 transition-all duration-300">
         <div className="max-w-md mx-auto flex flex-col">
           
-          {/* Контейнер Лого: плавно згортається через grid-rows */}
           <div className={`grid transition-all duration-500 ease-in-out ${
             isVisible ? 'grid-rows-[1fr] opacity-100 mb-4' : 'grid-rows-[0fr] opacity-0 mb-0'
           }`}>
@@ -80,7 +79,7 @@ function App() {
                   <Logo />
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400">
+                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400 transition-all">
                     <Settings className="w-5 h-5" />
                   </button>
                   <button onClick={() => setIsCartOpen(true)} className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg active:scale-95 transition-all">
@@ -96,18 +95,28 @@ function App() {
             </div>
           </div>
 
-          {/* Пошук: плавно піднімається, коли лого зникає */}
           <div className={`relative group transition-transform duration-500 ease-in-out ${
             !isVisible ? '-translate-y-2' : 'translate-y-0'
           }`}>
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#D4A373] transition-colors" />
+            
             <input
               type="text"
               placeholder="Знайти магію рослин..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm outline-none"
+              className="w-full pl-12 pr-12 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm outline-none"
             />
+
+            {/* Кнопка очищення */}
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-100/50 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-all active:scale-90"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -115,7 +124,7 @@ function App() {
       <main className="max-w-md mx-auto px-4 mt-4 relative z-10">
         {isSettingsOpen && (
           <div className="mb-8 p-6 bg-white/60 backdrop-blur-sm rounded-[2rem] border border-white shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
-            <label className="block text-[10px] font-black text-[#D4A373] uppercase tracking-[0.2em] mb-3 text-center text-slate-400 font-sans">Курс EUR/UAH</label>
+            <label className="block text-[10px] font-black text-[#D4A373] uppercase tracking-[0.2em] mb-3 text-center text-slate-400">Налаштування курсу</label>
             <div className="relative">
               <input 
                 type="number" 
@@ -123,7 +132,7 @@ function App() {
                 onChange={(e) => setExchangeRate(Number(e.target.value))} 
                 className="w-full bg-white/80 border-none rounded-2xl px-4 py-3 text-center text-xl font-light text-slate-600 focus:ring-2 focus:ring-orange-100 outline-none" 
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-300 uppercase font-sans">UAH</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-300 uppercase">UAH</span>
             </div>
           </div>
         )}
@@ -133,7 +142,7 @@ function App() {
             <section key={category}>
               <div className="flex items-center justify-center gap-3 mb-6">
                 <div className="h-px w-6 bg-[#E8E0D9]" />
-                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#A69080] font-sans">{category}</h2>
+                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#A69080]">{category}</h2>
                 <div className="h-px w-6 bg-[#E8E0D9]" />
               </div>
               <div className="grid gap-4">
