@@ -8,7 +8,12 @@ import {
   Minus, 
   ChevronRight,
   Zap,
-  Leaf
+  Leaf,
+  CheckCircle,
+  Clock,
+  User,
+  Phone,
+  Truck
 } from 'lucide-react';
 
 export { 
@@ -21,5 +26,10 @@ export {
   Minus, 
   ChevronRight,
   Zap,
-  Leaf
+  Leaf,
+  CheckCircle,
+  Clock,
+  User,
+  Phone,
+  Truck
 };
