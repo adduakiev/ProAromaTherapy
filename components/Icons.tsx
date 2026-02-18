@@ -13,7 +13,8 @@ import {
   Clock,
   User,
   Phone,
-  Truck
+  Truck,
+  Package
 } from 'lucide-react';
 
 export { 
@@ -31,5 +32,6 @@ export {
   Clock,
   User,
   Phone,
-  Truck
+  Truck,
+  Package
 };
