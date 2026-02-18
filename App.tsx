@@ -28,9 +28,10 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null); // ДЛЯ ПЕРЕГЛЯДУ
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   const [orders, setOrders] = useState<Order[]>(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('aroma_orders') : null;
@@ -43,7 +44,6 @@ function App() {
 
   const [exchangeRate, setExchangeRate] = useState(FX_EUR_TO_UAH);
   const [costs, setCosts] = useState(DEFAULT_COSTS);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -81,9 +81,6 @@ function App() {
     setCart([]);
   };
 
-  const deleteOrder = (id: string) => setOrders(orders.filter(o => o.id !== id));
-  const toggleOrderStatus = (id: string) => setOrders(orders.map(o => o.id === id ? {...o, status: o.status === 'draft' ? 'shipped' : 'draft'} : o));
-
   return (
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans antialiased text-slate-800">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#F8F3EF_0%,#FDFBF9_100%)] pointer-events-none" />
@@ -95,7 +92,7 @@ function App() {
                 <button onClick={() => setIsOrdersOpen(true)} className="p-2.5 rounded-full hover:bg-white text-slate-400 transition-all ml-1"><ChevronRight className="w-5 h-5 rotate-180" /></button>
                 <div className="opacity-90"><Logo /></div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-2.5 rounded-full hover:bg-white text-slate-400"><Settings className="w-5 h-5" /></button>
+                  <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className={`p-2.5 rounded-full transition-all ${isSettingsOpen ? 'bg-orange-100 text-[#D4A373]' : 'hover:bg-white text-slate-400'}`}><Settings className="w-5 h-5" /></button>
                   <button onClick={() => setIsCartOpen(true)} className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg active:scale-95 transition-all">
                     <ShoppingBasket className="w-5 h-5" />
                     {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FDFBF9]">{cart.length}</span>}
@@ -113,6 +110,54 @@ function App() {
       </header>
 
       <main className="max-w-md mx-auto px-4 mt-4 relative z-10">
+        {isSettingsOpen && (
+          <div className="mb-8 p-6 bg-white/90 backdrop-blur-2xl rounded-[2.5rem] border border-white shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-[#D4A373]">Управління витратами</h3>
+              <button onClick={() => setIsSettingsOpen(false)}><X className="w-4 h-4 text-slate-300" /></button>
+            </div>
+            <div className="space-y-6">
+              <div className="flex justify-between items-center bg-[#FDFBF9] p-4 rounded-2xl border border-orange-50">
+                <span className="text-xs font-bold text-slate-500 tracking-tight">Курс EUR (€)</span>
+                <input type="number" value={exchangeRate} onChange={(e) => setExchangeRate(Number(e.target.value))} className="w-20 bg-white border border-orange-100 rounded-xl text-right font-black text-slate-800 outline-none p-2 shadow-sm" />
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Тара Олії (3 / 5 / 15 мл)</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {['oil3', 'oil5', 'oil15'].map(k => (
+                    <div key={k} className="bg-white p-2 rounded-xl border border-orange-50 shadow-sm text-center">
+                       <input type="number" value={costs[k as keyof typeof costs]} onChange={(e) => setCosts({...costs, [k]: Number(e.target.value)})} className="w-full bg-transparent border-none text-center font-bold text-slate-700 outline-none" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Гідролати (100P / 100G / 200 / 500)</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {['hydro100p', 'hydro100g', 'hydro200', 'hydro500'].map(k => (
+                    <div key={k} className="bg-white p-2 rounded-xl border border-orange-50 shadow-sm text-center">
+                       <input type="number" value={costs[k as keyof typeof costs]} onChange={(e) => setCosts({...costs, [k]: Number(e.target.value)})} className="w-full bg-transparent border-none text-center font-bold text-slate-700 outline-none" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <p className="text-[9px] font-black text-slate-400 uppercase pl-2">Етикетка</p>
+                  <input type="number" value={costs.label} onChange={(e) => setCosts({...costs, label: Number(e.target.value)})} className="w-full bg-white border border-orange-50 rounded-xl p-3 text-center font-bold text-slate-700 shadow-sm outline-none" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[9px] font-black text-slate-400 uppercase pl-2">Коробка</p>
+                  <input type="number" value={costs.shippingBox} onChange={(e) => setCosts({...costs, shippingBox: Number(e.target.value)})} className="w-full bg-white border border-orange-50 rounded-xl p-3 text-center font-bold text-slate-700 shadow-sm outline-none" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-12">
           {Object.entries(groupedProducts).map(([category, items]) => (
             <section key={category}>
@@ -125,16 +170,7 @@ function App() {
 
       {selectedProduct && <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} exchangeRate={exchangeRate} costs={costs} onSaveOrder={saveOrder} />
-      
-      <OrdersSidebar 
-        isOpen={isOrdersOpen} 
-        onClose={() => setIsOrdersOpen(false)} 
-        orders={orders} 
-        onDelete={deleteOrder} 
-        onToggleStatus={toggleOrderStatus}
-        onSelect={(o) => { setSelectedOrder(o); setIsOrdersOpen(false); }} 
-      />
-
+      <OrdersSidebar isOpen={isOrdersOpen} onClose={() => setIsOrdersOpen(false)} orders={orders} onDelete={(id) => setOrders(orders.filter(o => o.id !== id))} onToggleStatus={(id) => setOrders(orders.map(o => o.id === id ? {...o, status: o.status === 'draft' ? 'shipped' : 'draft'} : o))} onSelect={(o) => { setSelectedOrder(o); setIsOrdersOpen(false); }} />
       <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
     </div>
   );
