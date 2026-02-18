@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Logo } from './components/Logo';
 import { PRODUCTS, FX_EUR_TO_UAH, getPackCost } from './data';
 import { Product, CartItem } from './types';
@@ -13,6 +13,35 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(FX_EUR_TO_UAH);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  
+  // Нові стани для розумної шапки
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  // Логіка відстеження скролу
+  useEffect(() => {
+    const controlNavbar = () => {
+      if (typeof window !== 'undefined') {
+        // Якщо ми в самому верху — показуємо все
+        if (window.scrollY < 10) {
+          setIsVisible(true);
+        } 
+        // Якщо скролимо вниз і ми не в фокусі пошуку — ховаємо лого
+        else if (window.scrollY > lastScrollY && window.scrollY > 50 && !isSearchFocused) {
+          setIsVisible(false);
+        } 
+        // Якщо скролимо вгору — повертаємо
+        else if (window.scrollY < lastScrollY) {
+          setIsVisible(true);
+        }
+        setLastScrollY(window.scrollY);
+      }
+    };
+
+    window.addEventListener('scroll', controlNavbar);
+    return () => window.removeEventListener('scroll', controlNavbar);
+  }, [lastScrollY, isSearchFocused]);
 
   const groupedProducts = useMemo(() => {
     const lowerTerm = searchTerm.toLowerCase();
@@ -45,41 +74,52 @@ function App() {
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans antialiased text-slate-800">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#F8F3EF_0%,#FDFBF9_100%)] pointer-events-none" />
 
-      {/* Покращена шапка */}
-      <header className="sticky top-0 z-30 px-4 py-4">
+      {/* Розумна шапка */}
+      <header className="sticky top-0 z-30 px-4 py-4 transition-all duration-500 ease-in-out">
         <div className="max-w-md mx-auto">
-          <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-[2.5rem] p-3 shadow-sm flex items-center justify-between gap-4">
-            <div className="pl-3 opacity-90">
-              <Logo />
-            </div>
-            
-            <div className="flex items-center gap-1">
-              <button 
-                onClick={() => setIsSettingsOpen(!isSettingsOpen)} 
-                className="p-2.5 rounded-full hover:bg-white text-slate-400 transition-all"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
-              <button 
-                onClick={() => setIsCartOpen(true)} 
-                className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg shadow-slate-200 active:scale-95 transition-all"
-              >
-                <ShoppingBasket className="w-5 h-5" />
-                {cart.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FDFBF9]">
-                    {cart.length}
-                  </span>
-                )}
-              </button>
+          {/* Блок з Лого та кнопками - ховається через transform */}
+          <div className={`transition-all duration-500 ease-in-out ${
+            isVisible ? 'opacity-100 translate-y-0 h-auto mb-4' : 'opacity-0 -translate-y-12 h-0 overflow-hidden mb-0'
+          }`}>
+            <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-[2.5rem] p-3 shadow-sm flex items-center justify-between gap-4">
+              <div className="pl-3 opacity-90">
+                <Logo />
+              </div>
+              
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={() => setIsSettingsOpen(!isSettingsOpen)} 
+                  className="p-2.5 rounded-full hover:bg-white text-slate-400 transition-all"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => setIsCartOpen(true)} 
+                  className="relative p-3 rounded-full bg-slate-900 text-white shadow-lg shadow-slate-200 active:scale-95 transition-all"
+                >
+                  <ShoppingBasket className="w-5 h-5" />
+                  {cart.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#D4A373] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FDFBF9]">
+                      {cart.length}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="mt-4 relative group">
+          {/* Рядок пошуку - завжди залишається, але підтягується вгору */}
+          <div className={`relative group transition-all duration-500 ease-in-out ${!isVisible ? '-translate-y-2' : ''}`}>
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#D4A373] transition-colors" />
             <input
               type="text"
               placeholder="Знайти магію рослин..."
               value={searchTerm}
+              onFocus={() => {
+                setIsSearchFocused(true);
+                setIsVisible(true); // Показуємо все при фокусі для зручності
+              }}
+              onBlur={() => setIsSearchFocused(false)}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm"
             />
@@ -124,7 +164,7 @@ function App() {
                     </div>
                     <div className="flex -space-x-1.5">
                       {product.retailPrices.map(rp => (
-                        <div key={rp.volume} className="w-8 h-8 rounded-full bg-[#F8F3EF] border-2 border-white flex items-center justify-center shadow-sm group-hover:border-[#FDFBF9] transition-colors">
+                        <div key={rp.volume} className="w-8 h-8 rounded-full bg-[#F8F3EF] border-2 border-white flex items-center justify-center shadow-sm">
                           <span className="text-[8px] font-bold text-[#A69080]">
                             {rp.volume === 101 ? 'G' : rp.volume}
                           </span>
