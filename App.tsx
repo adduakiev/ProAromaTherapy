@@ -14,34 +14,33 @@ function App() {
   const [exchangeRate, setExchangeRate] = useState(FX_EUR_TO_UAH);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
-  // Нові стани для розумної шапки
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  // Логіка відстеження скролу
   useEffect(() => {
     const controlNavbar = () => {
       if (typeof window !== 'undefined') {
-        // Якщо ми в самому верху — показуємо все
-        if (window.scrollY < 10) {
+        const currentScrollY = window.scrollY;
+
+        // 1. Якщо ми в самому верху (менше 10px) — завжди показуємо
+        if (currentScrollY < 10) {
           setIsVisible(true);
         } 
-        // Якщо скролимо вниз і ми не в фокусі пошуку — ховаємо лого
-        else if (window.scrollY > lastScrollY && window.scrollY > 50 && !isSearchFocused) {
+        // 2. Якщо скролимо вниз більше ніж на 5px — ховаємо логотип
+        else if (currentScrollY > lastScrollY && currentScrollY > 50) {
           setIsVisible(false);
         } 
-        // Якщо скролимо вгору — повертаємо
-        else if (window.scrollY < lastScrollY) {
+        // 3. Якщо скролимо вгору — миттєво повертаємо логотип
+        else if (currentScrollY < lastScrollY) {
           setIsVisible(true);
         }
-        setLastScrollY(window.scrollY);
+        setLastScrollY(currentScrollY);
       }
     };
 
-    window.addEventListener('scroll', controlNavbar);
+    window.addEventListener('scroll', controlNavbar, { passive: true });
     return () => window.removeEventListener('scroll', controlNavbar);
-  }, [lastScrollY, isSearchFocused]);
+  }, [lastScrollY]);
 
   const groupedProducts = useMemo(() => {
     const lowerTerm = searchTerm.toLowerCase();
@@ -74,12 +73,13 @@ function App() {
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans antialiased text-slate-800">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#F8F3EF_0%,#FDFBF9_100%)] pointer-events-none" />
 
-      {/* Розумна шапка */}
-      <header className="sticky top-0 z-30 px-4 py-4 transition-all duration-500 ease-in-out">
+      <header className="sticky top-0 z-30 px-4 py-4">
         <div className="max-w-md mx-auto">
-          {/* Блок з Лого та кнопками - ховається через transform */}
-          <div className={`transition-all duration-500 ease-in-out ${
-            isVisible ? 'opacity-100 translate-y-0 h-auto mb-4' : 'opacity-0 -translate-y-12 h-0 overflow-hidden mb-0'
+          {/* Верхній блок: Лого + Кнопки */}
+          <div className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            isVisible 
+              ? 'opacity-100 translate-y-0 h-[68px] mb-4 scale-100' 
+              : 'opacity-0 -translate-y-20 h-0 overflow-hidden mb-0 scale-95'
           }`}>
             <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-[2.5rem] p-3 shadow-sm flex items-center justify-between gap-4">
               <div className="pl-3 opacity-90">
@@ -108,20 +108,17 @@ function App() {
             </div>
           </div>
 
-          {/* Рядок пошуку - завжди залишається, але підтягується вгору */}
-          <div className={`relative group transition-all duration-500 ease-in-out ${!isVisible ? '-translate-y-2' : ''}`}>
+          {/* Пошук: завжди видимий, плавно піднімається */}
+          <div className={`relative group transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            !isVisible ? '-translate-y-2' : 'translate-y-0'
+          }`}>
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#D4A373] transition-colors" />
             <input
               type="text"
               placeholder="Знайти магію рослин..."
               value={searchTerm}
-              onFocus={() => {
-                setIsSearchFocused(true);
-                setIsVisible(true); // Показуємо все при фокусі для зручності
-              }}
-              onBlur={() => setIsSearchFocused(false)}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm"
+              className="w-full pl-12 pr-4 py-4 bg-white/40 border border-white rounded-full focus:bg-white focus:ring-4 focus:ring-orange-50/20 transition-all placeholder:text-slate-300 text-sm shadow-sm outline-none"
             />
           </div>
         </div>
@@ -130,13 +127,13 @@ function App() {
       <main className="max-w-md mx-auto px-4 mt-4 relative z-10">
         {isSettingsOpen && (
           <div className="mb-8 p-6 bg-white/60 backdrop-blur-sm rounded-[2rem] border border-white shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
-            <label className="block text-[10px] font-black text-[#D4A373] uppercase tracking-[0.2em] mb-3 text-center">Налаштування курсу</label>
+            <label className="block text-[10px] font-black text-[#D4A373] uppercase tracking-[0.2em] mb-3 text-center text-slate-400">Налаштування курсу</label>
             <div className="relative">
               <input 
                 type="number" 
                 value={exchangeRate} 
                 onChange={(e) => setExchangeRate(Number(e.target.value))} 
-                className="w-full bg-white/80 border-none rounded-2xl px-4 py-3 text-center text-xl font-light text-slate-600 focus:ring-2 focus:ring-orange-100" 
+                className="w-full bg-white/80 border-none rounded-2xl px-4 py-3 text-center text-xl font-light text-slate-600 focus:ring-2 focus:ring-orange-100 outline-none" 
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-300 uppercase">UAH</span>
             </div>
